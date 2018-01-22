@@ -1,0 +1,9 @@
+- group:
+    name: kubernetes
+    state: present
+
+- user:
+    name: kubernetes
+    comment: "kubernetes"
+    uid: 1040
+    groups: root,kubernetes

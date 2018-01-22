@@ -1,0 +1,42 @@
+- name: Disable SWAP
+  shell: swapoff -a
+
+- name: Remove old go
+  apt:
+    name: go
+    state: absent
+
+- name: Remove go folder
+  shell: rm -f /usr/bin/go && rm -rf /usr/share/go
+
+- name: Get go 1.9.2
+  shell: wget https://dl.google.com/go/go1.9.2.linux-arm64.tar.gz
+
+- name: Unpack go
+  shell: tar -xzf go1.9.2.linux-arm64.tar.gz
+
+- name: Move go to /usr/share
+  shell: mv go /usr/share/
+
+- name: Link go to applications
+  shell: ln -s /usr/share/go/bin/go /usr/bin/go
+
+- name: Add $GOPATH
+  shell: |
+    echo "export GOPATH=$HOME/go" >> ~/.bashrc && \
+    echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> ~/.bashrc
+
+- name: Create $GOPATH
+  shell: mkdir ~/go
+
+- name: Get kubectl
+  shell: wget https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/arm64/kubectl
+
+- name: Remove old kubectl
+  shell: rm -rf /usr/bin/kubectl
+
+- name: Chmod for kubectl
+  shell: chmod +x kubectl
+
+- name: Move kubectl to /usr/bin
+  shell: mv kubectl /usr/bin

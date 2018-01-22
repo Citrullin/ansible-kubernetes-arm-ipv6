@@ -1,0 +1,5 @@
+production
+playbook.retry
+roles/generated_worker_config/files/worker-config/*
+roles/certificates/files/kubernetes-certificates/*
+.idea/*

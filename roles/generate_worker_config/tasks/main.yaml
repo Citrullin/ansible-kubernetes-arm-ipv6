@@ -1,0 +1,76 @@
+- name: Remove old worker config folder
+  shell: rm -rf /home/kubernetes/worker-config
+
+- name: Create worker config folder
+  shell: mkdir /home/kubernetes/worker-config
+
+- name: Set worker cluster
+  with_items: "{{ groups['worker'] }}"
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config set-cluster kubernetes \
+    --certificate-authority=/home/kubernetes/kubernetes-certificates/ca.pem \
+    --embed-certs=true \
+    --server=https://{{ ansible_host }}:6443 \
+    --kubeconfig={{ item }}.kubeconfig
+
+- name: Set worker credentials
+  with_items: "{{ groups['worker'] }}"
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config set-credentials system:node:{{ item }} \
+    --client-certificate=/home/kubernetes/kubernetes-certificates/{{ item }}.pem \
+    --client-key=/home/kubernetes/kubernetes-certificates/{{ item }}-key.pem \
+    --embed-certs=true \
+    --kubeconfig={{ item }}.kubeconfig
+
+- name: Set worker context
+  with_items: "{{ groups['worker'] }}"
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config set-context default \
+    --cluster=kubernetes \
+    --user=system:node:{{ item }} \
+    --kubeconfig={{ item }}.kubeconfig
+
+- name: Generate worker config
+  with_items: "{{ groups['worker'] }}"
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config use-context default --kubeconfig={{ item }}.kubeconfig
+
+- name: Set kube-proxy cluster
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config set-cluster kubernetes \
+    --certificate-authority=/home/kubernetes/kubernetes-certificates/ca.pem \
+    --embed-certs=true \
+    --server=https://{{ ansible_host }}:6443 \
+    --kubeconfig=kube-proxy.kubeconfig
+
+- name: Set kube-proxy credentials
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config set-credentials kube-proxy \
+     --client-certificate=/home/kubernetes/kubernetes-certificates/kube-proxy.pem \
+     --client-key=/home/kubernetes/kubernetes-certificates/kube-proxy-key.pem \
+     --embed-certs=true \
+     --kubeconfig=kube-proxy.kubeconfig
+
+- name: Set kube-proxy context
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config set-context default \
+    --cluster=kubernetes \
+    --user=kube-proxy \
+    --kubeconfig=kube-proxy.kubeconfig
+
+- name: Generate kube-proxy config file
+  shell: |
+   cd /home/kubernetes/worker-config && \
+   kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
+
+- synchronize:
+    mode: pull
+    src: /home/kubernetes/worker-config
+    dest: roles/generate_worker_config/files

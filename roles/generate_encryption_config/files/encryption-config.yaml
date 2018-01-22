@@ -1,0 +1,11 @@
+kind: EncryptionConfig
+apiVersion: v1
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: {'stderr_lines': [], u'changed': True, u'end': u'2018-01-22 12:10:49.317639', 'failed': False, u'stdout': u'6bwxiVHXVLgh7vXq1MTgyPMOLzbQPIKWaHstP7Betwc=', u'cmd': u'echo $(head -c 32 /dev/urandom | base64)', u'rc': 0, u'start': u'2018-01-22 12:10:49.308019', u'stderr': u'', u'delta': u'0:00:00.009620', 'stdout_lines': [u'6bwxiVHXVLgh7vXq1MTgyPMOLzbQPIKWaHstP7Betwc=']}
+      - identity: {}

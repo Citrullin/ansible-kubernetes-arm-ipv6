@@ -1,0 +1,111 @@
+- name: Get cfssl
+  shell: wget http://ftp.nl.debian.org/debian/pool/main/g/golang-github-cloudflare-cfssl/golang-cfssl_1.2.0+git20160825.89.7fb22c8-3_arm64.deb
+
+- name: Install cfssl
+  shell: dpkg -i golang-cfssl_1.2.0+git20160825.89.7fb22c8-3_arm64.deb
+
+- name: Remove old certificates folder
+  shell: rm -rf /home/kubernetes/kubernetes-certificates
+
+- name: Create certificates folder
+  shell: mkdir /home/kubernetes/kubernetes-certificates
+
+- template:
+    src: ../templates/ca-config.json.j2
+    dest: /home/kubernetes/kubernetes-certificates/ca-config.json
+    owner: kubernetes
+    group: kubernetes
+    mode: '0600'
+
+- template:
+    src: ../templates/ca-csr.json.j2
+    dest: /home/kubernetes/kubernetes-certificates/ca-csr.json
+    owner: kubernetes
+    group: kubernetes
+    mode: '0600'
+
+- name: Generate CA certificates
+  shell: cd /home/kubernetes/kubernetes-certificates && cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+
+- template:
+    src: ../templates/admin-csr.json.j2
+    dest: /home/kubernetes/kubernetes-certificates/admin-csr.json
+    owner: kubernetes
+    group: kubernetes
+    mode: '0600'
+
+- name: Generate admin certificates
+  shell: |
+   cd /home/kubernetes/kubernetes-certificates && \
+   cfssl gencert \
+   -ca=ca.pem \
+   -ca-key=ca-key.pem \
+   -config=ca-config.json \
+   -profile=kubernetes \
+   admin-csr.json | cfssljson -bare admin
+
+- name: Create CSR for each worker
+  with_items: "{{ groups['worker'] }}"
+  template:
+    src: ../templates/worker-csr.json.j2
+    dest: "/home/kubernetes/kubernetes-certificates/{{ item }}-csr.json"
+    owner: kubernetes
+    group: kubernetes
+    mode: '0600'
+
+- name: Generate worker csr certificates
+  with_items: "{{ groups['worker'] }}"
+  shell: |
+   cd /home/kubernetes/kubernetes-certificates && \
+   cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -hostname={{ item }},{{ hostvars[item].ansible_host }},{{ hostvars[item].internal_ip }} \
+    -profile=kubernetes \
+    {{ item }}-csr.json | cfssljson -bare {{ item }}
+
+- template:
+    src: ../templates/kube-proxy-csr.json.j2
+    dest: /home/kubernetes/kubernetes-certificates/kube-proxy-csr.json
+    owner: kubernetes
+    group: kubernetes
+    mode: '0600'
+
+- name: Generate kube-proxy certificate
+  shell: |
+   cd /home/kubernetes/kubernetes-certificates && \
+   cfssl gencert \
+    -ca=ca.pem \
+    -ca-key=ca-key.pem \
+    -config=ca-config.json \
+    -profile=kubernetes \
+    kube-proxy-csr.json | cfssljson -bare kube-proxy
+
+- template:
+    src: ../templates/kubernetes-csr.json.j2
+    dest: /home/kubernetes/kubernetes-certificates/kubernetes-csr.json
+    owner: kubernetes
+    group: kubernetes
+    mode: '0600'
+
+- name: Generate kubernetes certificate
+  shell: |
+   cd /home/kubernetes/kubernetes-certificates && \
+   cfssl gencert \
+     -ca=ca.pem \
+     -ca-key=ca-key.pem \
+     -config=ca-config.json \
+     -hostname=10.32.0.1,10.240.0.10,10.240.0.11,10.240.0.12,{{ ansible_host }},127.0.0.1,kubernetes.default \
+     -profile=kubernetes \
+     kubernetes-csr.json | cfssljson -bare kubernetes
+
+- synchronize:
+    mode: pull
+    src: /home/kubernetes/kubernetes-certificates
+    dest: roles/certificates/files
+
+- synchronize:
+    mode: push
+    src: roles/certificates/files
+    dest: /home/kubernetes

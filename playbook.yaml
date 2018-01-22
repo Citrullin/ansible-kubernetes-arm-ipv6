@@ -1,0 +1,21 @@
+- hosts: master
+  remote_user: root
+  roles:
+    - bootstrap_master
+    - certificates
+    - docker
+    - kubernetes
+    - generate_worker_config
+    - generate_encryption_config
+
+- hosts: worker
+  remote_user: root
+  roles:
+    - bootstrap_worker
+    - docker
+    - kubernetes
+
+- hosts: etcd
+  remote_user: root
+  roles:
+    - etcd

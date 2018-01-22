@@ -1,0 +1,24 @@
+- group:
+    name: kubernetes
+    state: present
+
+- user:
+    name: kubernetes
+    comment: "kubernetes"
+    uid: 1040
+    groups: root,kubernetes
+
+- synchronize:
+    mode: push
+    src: roles/certificates/files/kubernetes-certificates
+    dest: /home/kubernetes
+
+- synchronize:
+    mode: push
+    src: roles/generate_worker_config/files/worker-config
+    dest: /home/kubernetes
+
+- synchronize:
+    mode: push
+    src: roles/generate_encryption_config/files/encryption-config.yaml
+    dest: /home/kubernetes/worker-config/encryption-config.yaml

@@ -1,0 +1,15 @@
+- register: encryption_key
+  shell: echo $(head -c 32 /dev/urandom | base64)
+
+- name: Generate the encryption-config
+  template:
+    src: ../templates/encryption-config.yaml.j2
+    dest: "/home/kubernetes/encryption-config.yaml"
+    owner: kubernetes
+    group: kubernetes
+    mode: '0600'
+
+- synchronize:
+    mode: pull
+    src: /home/kubernetes/encryption-config.yaml
+    dest: roles/generate_encryption_config/files/encryption-config.yaml

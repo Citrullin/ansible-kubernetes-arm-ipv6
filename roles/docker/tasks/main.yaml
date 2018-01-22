@@ -1,0 +1,35 @@
+- name: Remove docker packages
+  apt:
+    name: docker docker-engine docker.io
+    state: absent
+
+- name: Run apt-get update
+  shell: apt-get -o Acquire::ForceIPv6=true update
+
+- name: Install docker repo dependencies
+  apt: name={{item}} state=present
+  with_items:
+       - apt-transport-https
+       - ca-certificates
+       - curl
+       - gnupg2
+       - software-properties-common
+
+- name: Install gpg key
+  shell: curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add -
+
+
+- name: Add ARM64 debian docker repository
+  shell: |
+   add-apt-repository \
+   "deb [arch=arm64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+   $(lsb_release -cs) \
+   stable"
+
+- name: Run apt-get update
+  shell: apt-get -o Acquire::ForceIPv6=true update
+
+- name: Install docker
+  apt:
+    name: docker-ce=17.12.0~ce-0~debian
+    state: present
