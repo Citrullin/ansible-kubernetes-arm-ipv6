@@ -22,7 +22,21 @@ There are a few configurations for the certificate configuration in the folder r
 Change the country (C), locality (L), state (ST) in each file. You can also change the size of the key and the other
 attributes. But this is only optional.
 
-Step 2. Create a inventory under the root. Name it production, stage or something similar.
+Step 2. Create a inventory under the root. Name it production, stage or something similar. It must have the following
+strucutre:
+
+```
+[master]
+$ALIAS_NAME_MASTER ansible_host=$IPV6_HOST_ADDRESS_MASTER internal_ip=$INTERNAL_IPV4_OR_IPV6
+
+[worker]
+$ALIAS_NAME_WORKER_01 ansible_host=$IPV6_HOST_ADDRESS_WORKER_01 internal_ip=$INTERNAL_IPV4_OR_IPV6
+$ALIAS_NAME_WORKER_02 ansible_host=$IPV6_HOST_ADDRESS_WORKER_02 internal_ip=$INTERNAL_IPV4_OR_IPV6
+
+[etcd]
+$ALIAS_ETCD_NODE_01 ansible_host=$IPV6_HOST_ADDRESS_ETCD_NODE_01 internal_ip=$INTERNAL_IPV4_OR_IPV6
+$ALIAS_ETCD_NODE_02 ansible_host=$IPV6_HOST_ADDRESS_ETCD_NODE_02 internal_ip=$INTERNAL_IPV4_OR_IPV6
+```
 
 
 Step 3. Run the playbook

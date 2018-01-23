@@ -7,5 +7,5 @@ resources:
       - aescbc:
           keys:
             - name: key1
-              secret: {'stderr_lines': [], u'changed': True, u'end': u'2018-01-22 12:10:49.317639', 'failed': False, u'stdout': u'6bwxiVHXVLgh7vXq1MTgyPMOLzbQPIKWaHstP7Betwc=', u'cmd': u'echo $(head -c 32 /dev/urandom | base64)', u'rc': 0, u'start': u'2018-01-22 12:10:49.308019', u'stderr': u'', u'delta': u'0:00:00.009620', 'stdout_lines': [u'6bwxiVHXVLgh7vXq1MTgyPMOLzbQPIKWaHstP7Betwc=']}
+              secret: {'stderr_lines': [], u'changed': True, u'end': u'2018-01-22 12:27:25.086270', 'failed': False, u'stdout': u'vx/Mu+MDXWlThygDPEKl/f4NUqbiOsx/Fq3kozHR8a0=', u'cmd': u'echo $(head -c 32 /dev/urandom | base64)', u'rc': 0, u'start': u'2018-01-22 12:27:25.075442', u'stderr': u'', u'delta': u'0:00:00.010828', 'stdout_lines': [u'vx/Mu+MDXWlThygDPEKl/f4NUqbiOsx/Fq3kozHR8a0=']}
       - identity: {}
