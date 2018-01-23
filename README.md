@@ -5,8 +5,9 @@ But feel free to contribute to it.
 # Kubernetes Ansible Playbook (ARM64 + IPv6 only)
 
 *Motivation:* I wanted to setup a kubernetes cluster on ARM64 nodes with IPv6 only. Since this is, I think, the future.
-No costs for ip-addresses anymore + cheap and energy efficient cores. But there are issues: Current kubernetes cluster
-setup solutions doesn't support this setup. So I do one by myself.
+No costs for ip-addresses anymore + cheap and energy efficient cores.
+But there are issues: Current kubernetes cluster installation solutions doesn't support this setup.
+So, I need to create one by myself.
 
 ## Preconditions
 
