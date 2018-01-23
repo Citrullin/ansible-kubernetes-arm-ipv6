@@ -42,5 +42,5 @@ $ALIAS_ETCD_NODE_02 ansible_host=$IPV6_HOST_ADDRESS_ETCD_NODE_02 internal_ip=$IN
 Step 3. Run the playbook
 
 ```bash
-ansible-playbook -u root -i production playbook.yaml
+ansible-playbook -u root -i $INVENTORY_FILE_NAME playbook.yaml
 ```
