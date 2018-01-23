@@ -2,4 +2,4 @@ production
 playbook.retry
 roles/certificates/files/kubernetes-certificates/*
 .idea/*
-roles/generate_worker_config/files/worker-config/*
+roles/generate_worker_config/files/*
